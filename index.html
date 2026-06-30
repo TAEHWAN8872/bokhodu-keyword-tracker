@@ -123,7 +123,8 @@ const TAG_COLOR = {
 const AVATAR_COLORS = ['#e07a5f','#3d5a80','#81b29a','#9065b0','#d9730d','#337ea9','#c4554d','#0f7b6c'];
 
 let rows = [];
-const STORAGE_KEY = 'cs-board-rows';
+const INDEX_KEY = 'cs-board-index';
+const rowKey = id => 'cs-board-row:' + id;
 
 function uid(){ return 'r'+Date.now()+Math.random().toString(36).slice(2,7); }
 
@@ -138,27 +139,41 @@ function defaultRow(){
 
 async function loadRows(){
   try{
-    const res = await window.storage.get(STORAGE_KEY, true);
-    rows = res && res.value ? JSON.parse(res.value) : [];
+    const idxRes = await window.storage.get(INDEX_KEY, true);
+    const ids = idxRes && idxRes.value ? JSON.parse(idxRes.value) : [];
+    rows = [];
+    for(const id of ids){
+      try{
+        const r = await window.storage.get(rowKey(id), true);
+        if(r && r.value) rows.push(JSON.parse(r.value));
+      }catch(e){ /* 해당 행 데이터 없음 - 건너뜀 */ }
+    }
   }catch(e){ rows = []; }
-  if(rows.length === 0){ rows = [defaultRow()]; }
+  if(rows.length === 0){ rows = [defaultRow()]; await persistIndex(); await persistRow(rows[0]); }
   render();
 }
 
-let saveTimer;
-function persist(){
+async function persistIndex(){
+  try{ await window.storage.set(INDEX_KEY, JSON.stringify(rows.map(r=>r.id)), true); }catch(e){}
+}
+
+let saveTimers = {};
+function persistRow(row){
   const statusEl = document.getElementById('saveStatus');
   statusEl.textContent = '저장 중...'; statusEl.classList.add('saving');
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(async ()=>{
-    try{
-      await window.storage.set(STORAGE_KEY, JSON.stringify(rows), true);
-      statusEl.textContent = '✓ 저장됨'; statusEl.classList.remove('saving');
-      setTimeout(()=>{ if(statusEl.textContent==='✓ 저장됨') statusEl.textContent=''; }, 1500);
-    }catch(e){
-      statusEl.textContent = '⚠ 저장 실패'; statusEl.classList.remove('saving');
-    }
-  }, 500);
+  clearTimeout(saveTimers[row.id]);
+  return new Promise(resolve=>{
+    saveTimers[row.id] = setTimeout(async ()=>{
+      try{
+        await window.storage.set(rowKey(row.id), JSON.stringify(row), true);
+        statusEl.textContent = '✓ 저장됨'; statusEl.classList.remove('saving');
+        setTimeout(()=>{ if(statusEl.textContent==='✓ 저장됨') statusEl.textContent=''; }, 1500);
+      }catch(e){
+        statusEl.textContent = '⚠ 저장 실패 (용량 초과 가능)'; statusEl.classList.remove('saving');
+      }
+      resolve();
+    }, 500);
+  });
 }
 
 function avatarColor(name){
@@ -227,12 +242,13 @@ function autoGrow(el){ el.style.height='auto'; el.style.height=(el.scrollHeight)
 function updateField(id, field, value){
   const r = rows.find(x=>x.id===id); if(!r) return;
   r[field] = value;
-  persist();
+  persistRow(r);
 }
 
 function addRow(){
-  rows.push(defaultRow());
-  render(); persist();
+  const newRow = defaultRow();
+  rows.push(newRow);
+  render(); persistIndex(); persistRow(newRow);
   const tbody = document.getElementById('tbody');
   tbody.parentElement.parentElement.scrollTop = tbody.parentElement.scrollHeight;
 }
@@ -240,7 +256,8 @@ function addRow(){
 function removeRow(id){
   if(!confirm('이 작업을 삭제하시겠습니까?')) return;
   rows = rows.filter(x=>x.id!==id);
-  render(); persist();
+  render(); persistIndex();
+  window.storage.delete(rowKey(id), true).catch(()=>{});
 }
 
 // ── 이미지 업로드 (자동 압축) ──
@@ -262,7 +279,7 @@ document.getElementById('fileInputHidden').addEventListener('change', async func
     }catch(err){ console.error('이미지 처리 실패', err); }
   }
   e.target.value = '';
-  render(); persist();
+  render(); persistRow(r);
 });
 
 function compressImage(file, maxDim, quality){
@@ -294,7 +311,7 @@ function removeFile(rowId, idx){
   const r = rows.find(x=>x.id===rowId); if(!r) return;
   if(!confirm('이 사진을 삭제하시겠습니까?')) return;
   r.files.splice(idx,1);
-  render(); persist();
+  render(); persistRow(r);
 }
 
 function openImgModal(src){
