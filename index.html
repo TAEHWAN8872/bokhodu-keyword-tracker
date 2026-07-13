@@ -1,335 +1,364 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CS 게시판</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>복호두 키워드 검색량</title>
 <style>
   :root{
-    --bg:#ffffff; --line:#e9e9e7; --line-strong:#dcdcd9;
-    --text:#37352f; --muted:#9b9a97; --hover:#f7f7f5;
-    --accent:#2383e2;
-    --red-bg:#fbe4e4; --red-tx:#c4554d;
-    --pink-bg:#f4dfeb; --pink-tx:#ad1a72;
-    --orange-bg:#faebdd; --orange-tx:#d9730d;
-    --yellow-bg:#fbf3db; --yellow-tx:#8a6a00;
-    --green-bg:#ddedea; --green-tx:#0f7b6c;
-    --blue-bg:#ddebf1; --blue-tx:#337ea9;
-    --purple-bg:#eae4f2; --purple-tx:#9065b0;
-    --gray-bg:#ebebea; --gray-tx:#787774;
+    --bg: #241509;
+    --bg-panel: #2f1d0f;
+    --shell: #7a5330;
+    --shell-light: #b98a52;
+    --gold: #c99a3e;
+    --gold-soft: #e0bd76;
+    --ivory: #f3e9d8;
+    --ivory-dim: #cbb99f;
+    --line: rgba(243,233,216,0.12);
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --serif: 'Noto Serif KR', Georgia, serif;
+    --sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
   }
-  *{box-sizing:border-box;}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
-  .wrap{max-width:1500px;margin:0 auto;padding:32px 40px 80px;}
-  .title-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
-  .title-row h1{font-size:1.9rem;font-weight:700;}
-  .sub{color:var(--muted);font-size:0.85rem;margin-bottom:20px;}
-  .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .count{color:var(--muted);font-size:0.82rem;}
-  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;}
-  table{border-collapse:collapse;width:100%;min-width:1280px;}
-  thead th{position:sticky;top:0;background:#fbfbfa;border-bottom:1px solid var(--line-strong);font-size:0.76rem;font-weight:600;color:var(--muted);text-align:left;padding:8px 10px;white-space:nowrap;}
-  tbody td{border-bottom:1px solid var(--line);padding:6px 8px;vertical-align:middle;}
-  tbody tr:hover{background:var(--hover);}
-  tbody tr:last-child td{border-bottom:none;}
-  .cell-input{border:none;background:transparent;font-family:inherit;font-size:0.86rem;color:var(--text);width:100%;padding:4px 4px;border-radius:4px;outline:none;}
-  .cell-input:focus{background:#fff;box-shadow:0 0 0 2px var(--accent);}
-  .cell-textarea{border:none;background:transparent;font-family:inherit;font-size:0.86rem;color:var(--text);width:100%;min-width:260px;padding:4px;resize:vertical;outline:none;border-radius:4px;line-height:1.4;}
-  .cell-textarea:focus{background:#fff;box-shadow:0 0 0 2px var(--accent);}
-  .qty-cell{width:64px;text-align:center;}
-  .tag-select{appearance:none;border:none;font-family:inherit;font-size:0.78rem;font-weight:600;padding:3px 22px 3px 10px;border-radius:5px;cursor:pointer;outline:none;background-repeat:no-repeat;background-position:right 6px center;background-size:9px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23999' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");}
-  .date-cell input[type=date]{border:none;background:transparent;font-family:inherit;font-size:0.82rem;color:var(--text);outline:none;width:118px;}
-  .manager-cell{display:flex;align-items:center;gap:6px;}
-  .avatar{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700;}
-  .files-cell{display:flex;align-items:center;gap:4px;flex-wrap:wrap;max-width:260px;}
-  .thumb{width:30px;height:30px;border-radius:5px;object-fit:cover;cursor:pointer;border:1px solid var(--line);flex-shrink:0;}
-  .add-photo-btn{width:30px;height:30px;border-radius:5px;border:1px dashed var(--line-strong);background:transparent;color:var(--muted);font-size:0.9rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-  .add-photo-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .del-row-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;padding:3px 6px;border-radius:4px;opacity:0;transition:opacity .15s;}
-  tbody tr:hover .del-row-btn{opacity:1;}
-  .del-row-btn:hover{color:var(--red-tx);background:var(--red-bg);}
-  .add-row-bar{padding:8px 10px;}
-  .add-row-btn{display:flex;align-items:center;gap:6px;color:var(--muted);background:none;border:none;font-family:inherit;font-size:0.84rem;cursor:pointer;padding:6px 8px;border-radius:5px;}
-  .add-row-btn:hover{background:var(--hover);color:var(--text);}
 
-  /* 이미지 미리보기 모달 */
-  .img-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:3000;align-items:center;justify-content:center;padding:24px;}
-  .img-modal.show{display:flex;}
-  .img-modal img{max-width:92vw;max-height:88vh;border-radius:6px;}
-  .img-modal-close{position:absolute;top:18px;right:24px;color:#fff;font-size:1.6rem;cursor:pointer;background:none;border:none;}
+  * { box-sizing: border-box; }
 
-  .save-status{font-size:0.76rem;color:var(--muted);}
-  .save-status.saving{color:var(--accent);}
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(201,154,62,0.08), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(122,83,48,0.15), transparent 45%);
+    color: var(--ivory);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
 
-  ::-webkit-scrollbar{height:8px;width:8px;}
-  ::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:4px;}
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header.top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+  }
+
+  .brand {
+    font-family: var(--serif);
+    font-size: 15px;
+    letter-spacing: 0.14em;
+    color: var(--gold-soft);
+    text-transform: uppercase;
+  }
+
+  .status {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ivory-dim);
+  }
+
+  .refresh-btn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ivory-dim);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  .refresh-btn:hover { border-color: var(--gold); color: var(--gold-soft); }
+
+  /* --- Hero: walnut shell rings framing the keyword & sparkline --- */
+  .hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 0 40px;
+  }
+
+  .shell-rings {
+    width: min(340px, 78vw);
+    height: min(340px, 78vw);
+  }
+
+  .keyword-name {
+    font-family: var(--serif);
+    font-size: clamp(28px, 6vw, 40px);
+    color: var(--ivory);
+    letter-spacing: 0.02em;
+  }
+
+  .keyword-total {
+    font-family: var(--mono);
+    font-size: clamp(40px, 9vw, 64px);
+    color: var(--gold-soft);
+    line-height: 1;
+    margin: 6px 0 2px;
+  }
+
+  .keyword-sub {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ivory-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .split-row {
+    display: flex;
+    gap: 28px;
+    margin-top: 18px;
+  }
+  .split-item { text-align: center; }
+  .split-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ivory-dim);
+    text-transform: uppercase;
+  }
+  .split-value {
+    font-family: var(--mono);
+    font-size: 20px;
+    color: var(--ivory);
+    margin-top: 4px;
+  }
+
+  /* --- History table --- */
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px 20px 8px;
+  }
+
+  .panel h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--gold-soft);
+    margin: 0 0 16px;
+    letter-spacing: 0.04em;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: right;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--ivory-dim);
+    font-weight: 400;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--line);
+    text-transform: uppercase;
+  }
+  thead th:first-child { text-align: left; }
+  tbody td {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 9px 6px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ivory);
+  }
+  tbody td:first-child {
+    text-align: left;
+    font-family: var(--sans);
+    color: var(--ivory-dim);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(201,154,62,0.06); }
+
+  .empty, .error {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ivory-dim);
+    text-align: center;
+    padding: 40px 0;
+  }
+  .error { color: #d98a6b; }
+
+  footer {
+    margin-top: 32px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ivory-dim);
+    opacity: 0.7;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .keyword-total { transition: opacity 0.4s ease; }
+  }
+
+  button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="title-row"><h1>📋 CS 게시판</h1></div>
-  <div class="sub">매장 CS 접수 현황을 기록하고 사진을 첨부할 수 있습니다 · 모든 변경사항은 자동 저장되며 팀원 모두에게 공유됩니다</div>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">Keyword Tracker</div>
+      <div class="status">
+        <span id="updatedAt">불러오는 중…</span>
+        <button class="refresh-btn" id="refreshBtn" type="button">↻ 새로고침</button>
+      </div>
+    </header>
 
-  <div class="toolbar">
-    <span class="count" id="countLabel">0건</span>
-    <span class="save-status" id="saveStatus"></span>
+    <section class="hero">
+      <svg class="shell-rings" id="shellRings" viewBox="0 0 340 340" aria-hidden="true"></svg>
+      <div class="keyword-name">복호두</div>
+      <div class="keyword-total" id="totalValue">–</div>
+      <div class="keyword-sub">월간 검색량 (PC + 모바일)</div>
+      <div class="split-row">
+        <div class="split-item">
+          <div class="split-label">PC</div>
+          <div class="split-value" id="pcValue">–</div>
+        </div>
+        <div class="split-item">
+          <div class="split-label">Mobile</div>
+          <div class="split-value" id="mobileValue">–</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>최근 추이</h2>
+      <div id="tableHost">
+        <div class="empty">데이터를 불러오는 중…</div>
+      </div>
+    </section>
+
+    <footer>네이버 검색광고 API · 매일 오전 9시 자동 수집</footer>
   </div>
-
-  <div class="table-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:110px;">매장명</th>
-          <th style="width:280px;">CS 내용</th>
-          <th style="width:64px;">수량</th>
-          <th style="width:90px;">유형</th>
-          <th style="width:90px;">회수가능</th>
-          <th style="width:90px;">상태</th>
-          <th style="width:120px;">담당자</th>
-          <th style="width:128px;">신청일</th>
-          <th style="width:110px;">CS품목</th>
-          <th style="width:100px;">CS유형</th>
-          <th style="width:270px;">파일 첨부</th>
-          <th style="width:30px;"></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-    <div class="add-row-bar">
-      <button class="add-row-btn" onclick="addRow()">＋ 새 작업</button>
-    </div>
-  </div>
-</div>
-
-<div class="img-modal" id="imgModal" onclick="closeImgModal(event)">
-  <button class="img-modal-close" onclick="closeImgModal(event)">✕</button>
-  <img id="imgModalSrc" src="" />
-</div>
-
-<input type="file" id="fileInputHidden" accept="image/*" multiple style="display:none" />
 
 <script>
-const TAG_OPTS = {
-  type:    [['식품','red'],['비식품','blue']],
-  refund:  [['가능','green'],['불가능','yellow']],
-  status:  [['진행 중','blue'],['완료','green'],['보류','gray']],
-};
-const TAG_COLOR = {
-  red:['var(--red-bg)','var(--red-tx)'], pink:['var(--pink-bg)','var(--pink-tx)'],
-  orange:['var(--orange-bg)','var(--orange-tx)'], yellow:['var(--yellow-bg)','var(--yellow-tx)'],
-  green:['var(--green-bg)','var(--green-tx)'], blue:['var(--blue-bg)','var(--blue-tx)'],
-  purple:['var(--purple-bg)','var(--purple-tx)'], gray:['var(--gray-bg)','var(--gray-tx)'],
-};
-const AVATAR_COLORS = ['#e07a5f','#3d5a80','#81b29a','#9065b0','#d9730d','#337ea9','#c4554d','#0f7b6c'];
-
-let rows = [];
-const INDEX_KEY = 'cs-board-index';
-const rowKey = id => 'cs-board-row:' + id;
-
-function uid(){ return 'r'+Date.now()+Math.random().toString(36).slice(2,7); }
-
-function defaultRow(){
-  return {
-    id: uid(), store:'', content:'', qty:'',
-    type:'식품', refund:'가능', status:'진행 중',
-    manager:'', date:new Date().toISOString().slice(0,10),
-    csItem:'', csType:'', files:[]
+(function () {
+  const KEYWORD = "복호두";
+  const els = {
+    updatedAt: document.getElementById("updatedAt"),
+    total: document.getElementById("totalValue"),
+    pc: document.getElementById("pcValue"),
+    mobile: document.getElementById("mobileValue"),
+    tableHost: document.getElementById("tableHost"),
+    rings: document.getElementById("shellRings"),
+    refreshBtn: document.getElementById("refreshBtn"),
   };
-}
 
-async function loadRows(){
-  try{
-    const idxRes = await window.storage.get(INDEX_KEY, true);
-    const ids = idxRes && idxRes.value ? JSON.parse(idxRes.value) : [];
-    rows = [];
-    for(const id of ids){
-      try{
-        const r = await window.storage.get(rowKey(id), true);
-        if(r && r.value) rows.push(JSON.parse(r.value));
-      }catch(e){ /* 해당 행 데이터 없음 - 건너뜀 */ }
+  function fmt(n) {
+    if (n === null || n === undefined) return "–";
+    return n.toLocaleString("ko-KR");
+  }
+
+  function fmtDate(d) {
+    const [, m, day] = d.split("-");
+    return `${m}.${day}`;
+  }
+
+  // 동심원(호두 껍질 나이테) 안에 최근 검색량 추이를 그려주는 신 sparkline
+  function drawShellRings(history) {
+    const size = 340, cx = size / 2, cy = size / 2;
+    const rings = [150, 120, 92, 66];
+    let svg = "";
+
+    rings.forEach((r, i) => {
+      const opacity = 0.16 + i * 0.05;
+      svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--shell)" stroke-width="1" opacity="${opacity}" />`;
+    });
+
+    if (history.length > 1) {
+      const values = history.map((h) => h.total);
+      const max = Math.max(...values, 1);
+      const min = Math.min(...values, 0);
+      const range = Math.max(max - min, 1);
+      const R = 96;
+      const points = history.map((h, i) => {
+        const t = i / (history.length - 1);
+        const angle = -Math.PI / 2 + t * Math.PI * 1.5;
+        const norm = (h.total - min) / range;
+        const radius = R * 0.55 + norm * R * 0.45;
+        const x = cx + radius * Math.cos(angle);
+        const y = cy + radius * Math.sin(angle);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      });
+      svg += `<polyline points="${points.join(" ")}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />`;
+      const lastPt = points[points.length - 1].split(",");
+      svg += `<circle cx="${lastPt[0]}" cy="${lastPt[1]}" r="4.5" fill="var(--gold-soft)" />`;
+    } else {
+      svg += `<circle cx="${cx}" cy="${cy}" r="3" fill="var(--gold)" opacity="0.6" />`;
     }
-  }catch(e){ rows = []; }
-  if(rows.length === 0){ rows = [defaultRow()]; await persistIndex(); await persistRow(rows[0]); }
-  render();
-}
 
-async function persistIndex(){
-  try{ await window.storage.set(INDEX_KEY, JSON.stringify(rows.map(r=>r.id)), true); }catch(e){}
-}
-
-let saveTimers = {};
-function persistRow(row){
-  const statusEl = document.getElementById('saveStatus');
-  statusEl.textContent = '저장 중...'; statusEl.classList.add('saving');
-  clearTimeout(saveTimers[row.id]);
-  return new Promise(resolve=>{
-    saveTimers[row.id] = setTimeout(async ()=>{
-      try{
-        await window.storage.set(rowKey(row.id), JSON.stringify(row), true);
-        statusEl.textContent = '✓ 저장됨'; statusEl.classList.remove('saving');
-        setTimeout(()=>{ if(statusEl.textContent==='✓ 저장됨') statusEl.textContent=''; }, 1500);
-      }catch(e){
-        statusEl.textContent = '⚠ 저장 실패 (용량 초과 가능)'; statusEl.classList.remove('saving');
-      }
-      resolve();
-    }, 500);
-  });
-}
-
-function avatarColor(name){
-  let h=0; for(let i=0;i<name.length;i++) h = name.charCodeAt(i) + ((h<<5)-h);
-  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
-}
-
-function tagSelectHTML(rowId, field, value){
-  const opts = TAG_OPTS[field];
-  const [bg,tx] = TAG_COLOR[ (opts.find(o=>o[0]===value)||opts[0])[1] ];
-  const optsHTML = opts.map(([label]) => `<option value="${esc(label)}" ${label===value?'selected':''}>${esc(label)}</option>`).join('');
-  return `<select class="tag-select" style="background-color:${bg};color:${tx};" onchange="updateField('${rowId}','${field}',this.value)">${optsHTML}</select>`;
-}
-
-function render(){
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = rows.map(r => {
-    const filesHTML = (r.files||[]).map((f,i) =>
-      `<img class="thumb" src="${f}" onclick="openImgModal('${f.replace(/'/g,"%27")}')" title="클릭하여 크게 보기" oncontextmenu="event.preventDefault();removeFile('${r.id}',${i})" />`
-    ).join('');
-    return `
-    <tr id="row-${r.id}">
-      <td><input class="cell-input" value="${esc(r.store)}" placeholder="매장명" oninput="updateField('${r.id}','store',this.value)" /></td>
-      <td><textarea class="cell-textarea" rows="1" placeholder="CS 내용(상세하게 작성)" oninput="autoGrow(this);updateField('${r.id}','content',this.value)">${esc(r.content)}</textarea></td>
-      <td class="qty-cell"><input class="cell-input" style="text-align:center;" value="${esc(r.qty)}" placeholder="0" oninput="updateField('${r.id}','qty',this.value)" /></td>
-      <td>${tagSelectHTML(r.id,'type',r.type)}</td>
-      <td>${tagSelectHTML(r.id,'refund',r.refund)}</td>
-      <td>${tagSelectHTML(r.id,'status',r.status)}</td>
-      <td>
-        <div class="manager-cell">
-          ${r.manager ? `<span class="avatar" style="background:${avatarColor(r.manager)}">${esc(r.manager[0])}</span>` : ''}
-          <input class="cell-input" value="${esc(r.manager)}" placeholder="담당자" oninput="updateField('${r.id}','manager',this.value);renderRowOnly('${r.id}')" />
-        </div>
-      </td>
-      <td class="date-cell"><input type="date" value="${esc(r.date)}" oninput="updateField('${r.id}','date',this.value)" /></td>
-      <td><input class="cell-input" value="${esc(r.csItem)}" placeholder="CS품목" oninput="updateField('${r.id}','csItem',this.value)" /></td>
-      <td><input class="cell-input" value="${esc(r.csType)}" placeholder="CS유형" oninput="updateField('${r.id}','csType',this.value)" /></td>
-      <td>
-        <div class="files-cell">
-          ${filesHTML}
-          <button class="add-photo-btn" onclick="triggerFileUpload('${r.id}')" title="사진 첨부 (우클릭으로 삭제)">＋</button>
-        </div>
-      </td>
-      <td><button class="del-row-btn" onclick="removeRow('${r.id}')" title="행 삭제">✕</button></td>
-    </tr>`;
-  }).join('');
-  document.getElementById('countLabel').textContent = rows.length + '건';
-  // 텍스트영역 높이 자동 조정
-  tbody.querySelectorAll('.cell-textarea').forEach(autoGrow);
-}
-
-function renderRowOnly(id){
-  // 아바타 갱신을 위해 해당 행만 다시 그림 (포커스 유지 위해 간단 처리)
-  const r = rows.find(x=>x.id===id);
-  const tr = document.getElementById('row-'+id);
-  if(!tr || !r) return;
-  const cell = tr.children[6];
-  cell.innerHTML = `<div class="manager-cell">
-    ${r.manager ? `<span class="avatar" style="background:${avatarColor(r.manager)}">${esc(r.manager[0])}</span>` : ''}
-    <input class="cell-input" value="${esc(r.manager)}" placeholder="담당자" oninput="updateField('${r.id}','manager',this.value);renderRowOnly('${r.id}')" />
-  </div>`;
-}
-
-function autoGrow(el){ el.style.height='auto'; el.style.height=(el.scrollHeight)+'px'; }
-
-function updateField(id, field, value){
-  const r = rows.find(x=>x.id===id); if(!r) return;
-  r[field] = value;
-  persistRow(r);
-}
-
-function addRow(){
-  const newRow = defaultRow();
-  rows.push(newRow);
-  render(); persistIndex(); persistRow(newRow);
-  const tbody = document.getElementById('tbody');
-  tbody.parentElement.parentElement.scrollTop = tbody.parentElement.scrollHeight;
-}
-
-function removeRow(id){
-  if(!confirm('이 작업을 삭제하시겠습니까?')) return;
-  rows = rows.filter(x=>x.id!==id);
-  render(); persistIndex();
-  window.storage.delete(rowKey(id), true).catch(()=>{});
-}
-
-// ── 이미지 업로드 (자동 압축) ──
-let _uploadTargetId = null;
-function triggerFileUpload(id){
-  _uploadTargetId = id;
-  document.getElementById('fileInputHidden').click();
-}
-document.getElementById('fileInputHidden').addEventListener('change', async function(e){
-  const files = Array.from(e.target.files || []);
-  if(!files.length || !_uploadTargetId) return;
-  const r = rows.find(x=>x.id===_uploadTargetId);
-  if(!r) return;
-  for(const file of files){
-    try{
-      const compressed = await compressImage(file, 900, 0.72);
-      r.files = r.files || [];
-      r.files.push(compressed);
-    }catch(err){ console.error('이미지 처리 실패', err); }
+    els.rings.innerHTML = svg;
   }
-  e.target.value = '';
-  render(); persistRow(r);
-});
 
-function compressImage(file, maxDim, quality){
-  return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = new Image();
-      img.onload = () => {
-        let { width, height } = img;
-        if(width > maxDim || height > maxDim){
-          if(width > height){ height = Math.round(height * maxDim / width); width = maxDim; }
-          else { width = Math.round(width * maxDim / height); height = maxDim; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.onerror = reject;
-      img.src = ev.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+  function renderTable(history) {
+    if (!history.length) {
+      els.tableHost.innerHTML = '<div class="empty">아직 수집된 데이터가 없습니다. 첫 자동 수집(오전 9시) 또는 수동 실행을 기다려주세요.</div>';
+      return;
+    }
+    const rows = [...history].reverse().slice(0, 30).map((h) => `
+      <tr>
+        <td>${fmtDate(h.date)}</td>
+        <td>${fmt(h.pc)}</td>
+        <td>${fmt(h.mobile)}</td>
+        <td>${fmt(h.total)}</td>
+      </tr>
+    `).join("");
 
-function removeFile(rowId, idx){
-  const r = rows.find(x=>x.id===rowId); if(!r) return;
-  if(!confirm('이 사진을 삭제하시겠습니까?')) return;
-  r.files.splice(idx,1);
-  render(); persistRow(r);
-}
-
-function openImgModal(src){
-  document.getElementById('imgModalSrc').src = src;
-  document.getElementById('imgModal').classList.add('show');
-}
-function closeImgModal(e){
-  if(e.target.id==='imgModal' || e.target.classList.contains('img-modal-close') || e.target.id==='imgModalSrc'){
-    if(e.target.id==='imgModalSrc') return;
+    els.tableHost.innerHTML = `
+      <table>
+        <thead>
+          <tr><th>날짜</th><th>PC</th><th>모바일</th><th>합계</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
   }
-  document.getElementById('imgModal').classList.remove('show');
-}
 
-function esc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  async function loadData() {
+    els.updatedAt.textContent = "불러오는 중…";
+    try {
+      const res = await fetch(`data.json?_=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`data.json 요청 실패 (${res.status})`);
+      const data = await res.json();
 
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.getElementById('imgModal').classList.remove('show'); });
+      const entry = data.keywords?.[KEYWORD];
+      const history = entry?.history ?? [];
+      const latest = history[history.length - 1];
 
-loadRows();
+      drawShellRings(history);
+      renderTable(history);
+
+      els.total.textContent = latest ? fmt(latest.total) : "–";
+      els.pc.textContent = latest ? fmt(latest.pc) : "–";
+      els.mobile.textContent = latest ? fmt(latest.mobile) : "–";
+
+      els.updatedAt.textContent = data.updatedAt
+        ? `업데이트: ${new Date(data.updatedAt).toLocaleString("ko-KR")}`
+        : "아직 업데이트되지 않음";
+    } catch (err) {
+      console.error(err);
+      els.updatedAt.textContent = "불러오기 실패";
+      els.tableHost.innerHTML = `<div class="error">데이터를 불러올 수 없습니다: ${err.message}</div>`;
+      drawShellRings([]);
+    }
+  }
+
+  els.refreshBtn.addEventListener("click", loadData);
+  loadData();
+})();
 </script>
 </body>
 </html>
