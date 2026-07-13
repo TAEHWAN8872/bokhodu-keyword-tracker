@@ -499,6 +499,7 @@
     const rangeLabel = window30.length
       ? `${fmtMD(window30[0].date)} ~ ${fmtMD(window30[window30.length - 1].date)}`
       : "";
+    const windowLabel = `최근 ${window30.length}일`;
 
     els.todayDate.textContent = latest.date;
 
@@ -511,7 +512,7 @@
     els.pcPct.textContent = `${pcPct.toFixed(1)}%`;
     els.mobilePct.textContent = `${mobilePct.toFixed(1)}%`;
 
-    let diffHtml = `${rangeLabel} · 최근 30일`;
+    let diffHtml = `${rangeLabel} · ${windowLabel}`;
     if (prev) {
       const diff = latest.total - prev.total;
       const cls = diff >= 0 ? "diff-up" : "diff-down";
@@ -519,8 +520,8 @@
       diffHtml = `${rangeLabel} · <span class="${cls}">${arrow} ${fmt(Math.abs(diff))}</span> 전일비`;
     }
     els.totalSub.innerHTML = diffHtml;
-    els.pcSub.textContent = `${rangeLabel} · 최근 30일`;
-    els.mobileSub.textContent = `${rangeLabel} · 최근 30일`;
+    els.pcSub.textContent = `${rangeLabel} · ${windowLabel}`;
+    els.mobileSub.textContent = `${rangeLabel} · ${windowLabel}`;
   }
 
   function renderChart(history) {
