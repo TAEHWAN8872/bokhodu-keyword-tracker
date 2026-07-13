@@ -6,7 +6,7 @@
 <title>복호두 키워드 검색량</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #fbf7ef;
@@ -73,6 +73,7 @@
 
   .status-text {
     font-family: var(--mono);
+    font-weight: 500;
     font-size: 12px;
     color: var(--ink-dim);
   }
@@ -82,13 +83,19 @@
     border: 1px solid var(--line);
     color: var(--gold-deep);
     font-family: var(--mono);
+    font-weight: 600;
     font-size: 12px;
     padding: 7px 14px;
     border-radius: 6px;
     cursor: pointer;
     box-shadow: var(--shadow);
+    transition: opacity 0.15s ease;
   }
   .refresh-btn:hover { border-color: var(--gold); background: #fffaf0; }
+  .refresh-btn:disabled { opacity: 0.6; cursor: default; }
+  .refresh-btn .spin { display: inline-block; }
+  .refresh-btn.loading .spin { animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* --- Hero --- */
   .hero {
@@ -230,6 +237,7 @@
   }
   .metric-value {
     font-family: var(--mono);
+    font-weight: 700;
     font-size: clamp(24px, 3.4vw, 30px);
     color: var(--ink);
   }
@@ -239,6 +247,7 @@
 
   .metric-pct {
     font-family: var(--mono);
+    font-weight: 600;
     font-size: 14px;
     color: var(--ink-dim);
   }
@@ -246,11 +255,12 @@
   .metric-sub {
     margin-top: 10px;
     font-family: var(--mono);
-    font-size: 11.5px;
+    font-weight: 500;
+    font-size: 12px;
     color: var(--ink-dim);
   }
-  .metric-sub .diff-up { color: var(--up); }
-  .metric-sub .diff-down { color: var(--down); }
+  .metric-sub .diff-up { color: var(--up); font-weight: 600; }
+  .metric-sub .diff-down { color: var(--down); font-weight: 600; }
 
   /* --- Chart panel --- */
   .panel {
@@ -272,6 +282,7 @@
     align-items: center;
     gap: 7px;
     font-family: var(--mono);
+    font-weight: 600;
     font-size: 12px;
     letter-spacing: 0.06em;
     color: var(--ink-dim);
@@ -289,7 +300,7 @@
     font-size: 11px;
     letter-spacing: 0.08em;
     color: var(--ink-dim);
-    font-weight: 400;
+    font-weight: 700;
     padding: 8px 6px;
     border-bottom: 1px solid var(--line);
     text-transform: uppercase;
@@ -298,6 +309,7 @@
   tbody td {
     text-align: right;
     font-family: var(--mono);
+    font-weight: 600;
     font-size: 13px;
     padding: 9px 6px;
     border-bottom: 1px solid var(--line);
@@ -306,13 +318,20 @@
   tbody td:first-child {
     text-align: left;
     font-family: var(--sans);
+    font-weight: 600;
     color: var(--ink-dim);
+  }
+  tbody td.pct {
+    color: var(--ink-dim);
+    font-weight: 500;
+    font-size: 12px;
   }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: #fdf7ea; }
 
   .empty, .error {
     font-family: var(--mono);
+    font-weight: 500;
     font-size: 13px;
     color: var(--ink-dim);
     text-align: center;
@@ -341,7 +360,7 @@
       <div class="brand">복호두</div>
       <div class="status">
         <span class="status-text" id="updatedAt">불러오는 중…</span>
-        <button class="refresh-btn" id="refreshBtn" type="button">↻ 새로고침</button>
+        <button class="refresh-btn" id="refreshBtn" type="button"><span class="spin">↻</span> 새로고침</button>
       </div>
     </header>
 
@@ -499,13 +518,13 @@
     const niceMax = Math.ceil(maxTotal / 10000) * 10000 || 10;
     const gridSteps = 4;
 
-    let svg = `<svg viewBox="0 0 ${chartW} ${chartH}" width="${chartW}" height="${chartH}" xmlns="http://www.w3.org/2000/svg">`;
+    let svg = `<svg viewBox="0 0 ${chartW} ${chartH}" width="${chartW}" height="${chartH}" xmlns="http://www.w3.org/2000/svg" style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-weight:600;">`;
 
     for (let i = 0; i <= gridSteps; i++) {
       const val = (niceMax / gridSteps) * i;
       const y = topPad + plotH - (val / niceMax) * plotH;
       svg += `<line x1="${leftPad}" y1="${y}" x2="${chartW - 4}" y2="${y}" stroke="rgba(43,32,24,0.08)" stroke-width="1" />`;
-      svg += `<text x="${leftPad - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#8d7d6a">${val >= 1000 ? Math.round(val / 1000) + "k" : val}</text>`;
+      svg += `<text x="${leftPad - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#5c4d3d">${val >= 1000 ? Math.round(val / 1000) + "k" : val}</text>`;
     }
 
     const labelStep = Math.max(1, Math.ceil(n / 30));
@@ -521,7 +540,7 @@
       svg += `<rect x="${x}" y="${yPcTop}" width="${barW}" height="${pcH}" fill="var(--pc-accent)" rx="1.5" />`;
 
       if (i % labelStep === 0) {
-        svg += `<text x="${x + barW / 2}" y="${chartH - 6}" text-anchor="middle" font-size="9.5" fill="#8d7d6a" transform="rotate(-40 ${x + barW / 2} ${chartH - 6})">${fmtMD(d.date)}</text>`;
+        svg += `<text x="${x + barW / 2}" y="${chartH - 6}" text-anchor="middle" font-size="9.5" fill="#5c4d3d" transform="rotate(-40 ${x + barW / 2} ${chartH - 6})">${fmtMD(d.date)}</text>`;
       }
     });
 
@@ -534,14 +553,18 @@
       els.tableHost.innerHTML = '<div class="empty">아직 수집된 데이터가 없습니다. 첫 자동 수집(오전 9시) 또는 수동 실행을 기다려주세요.</div>';
       return;
     }
-    const rows = [...history].reverse().slice(0, 30).map((h) => `
+    const rows = [...history].reverse().slice(0, 30).map((h) => {
+      const pcPct = h.total ? ((h.pc / h.total) * 100).toFixed(1) : "0.0";
+      const mobilePct = h.total ? ((h.mobile / h.total) * 100).toFixed(1) : "0.0";
+      return `
       <tr>
         <td>${fmtMD(h.date)}</td>
-        <td>${fmt(h.pc)}</td>
-        <td>${fmt(h.mobile)}</td>
+        <td>${fmt(h.pc)} <span class="pct">(${pcPct}%)</span></td>
+        <td>${fmt(h.mobile)} <span class="pct">(${mobilePct}%)</span></td>
         <td>${fmt(h.total)}</td>
       </tr>
-    `).join("");
+    `;
+    }).join("");
 
     els.tableHost.innerHTML = `
       <table>
@@ -554,6 +577,8 @@
   }
 
   async function loadData() {
+    els.refreshBtn.disabled = true;
+    els.refreshBtn.classList.add("loading");
     els.updatedAt.textContent = "불러오는 중…";
     try {
       const res = await fetch(`data.json?_=${Date.now()}`, { cache: "no-store" });
@@ -567,14 +592,19 @@
       renderChart(history);
       renderTable(history);
 
-      els.updatedAt.textContent = data.updatedAt
-        ? `업데이트: ${new Date(data.updatedAt).toLocaleString("ko-KR")}`
-        : "아직 업데이트되지 않음";
+      const checkedAt = new Date().toLocaleTimeString("ko-KR");
+      const updatedLabel = data.updatedAt
+        ? new Date(data.updatedAt).toLocaleString("ko-KR")
+        : "아직 없음";
+      els.updatedAt.textContent = `데이터 업데이트: ${updatedLabel}  ·  방금 확인함(${checkedAt})`;
     } catch (err) {
       console.error(err);
       els.updatedAt.textContent = "불러오기 실패";
       els.tableHost.innerHTML = `<div class="error">데이터를 불러올 수 없습니다: ${err.message}</div>`;
       els.chartHost.innerHTML = `<div class="error">차트를 표시할 수 없습니다.</div>`;
+    } finally {
+      els.refreshBtn.disabled = false;
+      els.refreshBtn.classList.remove("loading");
     }
   }
 
