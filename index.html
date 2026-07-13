@@ -296,29 +296,38 @@
   /* --- Detail table --- */
   table { width: 100%; border-collapse: collapse; }
   thead th {
-    text-align: right;
+    text-align: center;
     font-size: 11px;
     letter-spacing: 0.08em;
     color: var(--ink-dim);
     font-weight: 700;
-    padding: 8px 6px;
+    padding: 10px 6px;
     border-bottom: 1px solid var(--line);
     text-transform: uppercase;
   }
-  thead th:first-child { text-align: left; }
   tbody td {
-    text-align: right;
+    text-align: center;
     font-family: var(--mono);
     font-weight: 600;
     font-size: 13px;
-    padding: 9px 6px;
+    padding: 12px 6px;
     border-bottom: 1px solid var(--line);
     color: var(--ink);
   }
   tbody td:first-child {
-    text-align: left;
     font-family: var(--sans);
-    font-weight: 600;
+    color: var(--ink);
+  }
+  .date-main {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .date-range {
+    margin-top: 3px;
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 11px;
     color: var(--ink-dim);
   }
   tbody td.pct {
@@ -326,8 +335,14 @@
     font-weight: 500;
     font-size: 12px;
   }
+  tbody td.total-cell {
+    color: var(--total-accent);
+    font-weight: 700;
+  }
+  tbody td.total-cell .pct { color: var(--total-accent); opacity: 0.65; }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: #fdf7ea; }
+  tbody tr:nth-child(even) td { background: #faf6ee; }
+  tbody tr:hover td { background: #fdf0d8; }
 
   .empty, .error {
     font-family: var(--mono);
@@ -463,6 +478,16 @@
     return `${m}-${day}`;
   }
 
+  // dateStr(YYYY-MM-DD)에서 days만큼 이동한 날짜를 'MM-DD'로 반환
+  function shiftDateMD(dateStr, days) {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    dt.setUTCDate(dt.getUTCDate() + days);
+    const mm = String(dt.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(dt.getUTCDate()).padStart(2, "0");
+    return `${mm}-${dd}`;
+  }
+
   function renderMetrics(history) {
     if (!history.length) {
       els.todayDate.textContent = "–";
@@ -556,12 +581,17 @@
     const rows = [...history].reverse().slice(0, 30).map((h) => {
       const pcPct = h.total ? ((h.pc / h.total) * 100).toFixed(1) : "0.0";
       const mobilePct = h.total ? ((h.mobile / h.total) * 100).toFixed(1) : "0.0";
+      const rangeStart = shiftDateMD(h.date, -30);
+      const rangeEnd = shiftDateMD(h.date, -1);
       return `
       <tr>
-        <td>${fmtMD(h.date)}</td>
+        <td>
+          <div class="date-main">${h.date}</div>
+          <div class="date-range">${rangeStart} ~ ${rangeEnd}</div>
+        </td>
         <td>${fmt(h.pc)} <span class="pct">(${pcPct}%)</span></td>
         <td>${fmt(h.mobile)} <span class="pct">(${mobilePct}%)</span></td>
-        <td>${fmt(h.total)}</td>
+        <td class="total-cell">${fmt(h.total)} <span class="pct">(100%)</span></td>
       </tr>
     `;
     }).join("");
