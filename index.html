@@ -6,15 +6,21 @@
 <title>복호두 키워드 검색량</title>
 <style>
   :root{
-    --bg: #241509;
-    --bg-panel: #2f1d0f;
-    --shell: #7a5330;
-    --shell-light: #b98a52;
-    --gold: #c99a3e;
-    --gold-soft: #e0bd76;
-    --ivory: #f3e9d8;
-    --ivory-dim: #cbb99f;
-    --line: rgba(243,233,216,0.12);
+    --bg: #fbf7ef;
+    --bg-panel: #ffffff;
+    --bg-card: #ffffff;
+    --bg-hero: #fdf1d8;
+    --ink: #2b2018;
+    --ink-dim: #8d7d6a;
+    --line: rgba(43,32,24,0.10);
+    --gold: #e2a93a;
+    --gold-deep: #c78a1f;
+    --total-accent: #d9704a;
+    --pc-accent: #6c9f77;
+    --mobile-accent: #a9702f;
+    --up: #6c9f77;
+    --down: #d9704a;
+    --shadow: 0 1px 2px rgba(43,32,24,0.05), 0 4px 14px rgba(43,32,24,0.05);
     --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     --serif: 'Noto Serif KR', Georgia, serif;
     --sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
@@ -26,10 +32,7 @@
     margin: 0;
     padding: 0;
     background: var(--bg);
-    background-image:
-      radial-gradient(circle at 15% 10%, rgba(201,154,62,0.08), transparent 40%),
-      radial-gradient(circle at 85% 90%, rgba(122,83,48,0.15), transparent 45%);
-    color: var(--ivory);
+    color: var(--ink);
     font-family: var(--sans);
     min-height: 100vh;
   }
@@ -37,126 +40,249 @@
   a { color: inherit; }
 
   .wrap {
-    max-width: 760px;
+    max-width: 980px;
     margin: 0 auto;
-    padding: 48px 24px 80px;
+    padding: 40px 24px 80px;
   }
 
   header.top {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 40px;
+    margin-bottom: 36px;
     border-bottom: 1px solid var(--line);
     padding-bottom: 18px;
   }
 
   .brand {
     font-family: var(--serif);
-    font-size: 15px;
-    letter-spacing: 0.14em;
-    color: var(--gold-soft);
-    text-transform: uppercase;
+    font-size: 17px;
+    letter-spacing: 0.06em;
+    color: var(--ink);
   }
 
   .status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .status-text {
     font-family: var(--mono);
     font-size: 12px;
-    color: var(--ivory-dim);
+    color: var(--ink-dim);
   }
 
   .refresh-btn {
-    background: none;
+    background: #fff;
     border: 1px solid var(--line);
-    color: var(--ivory-dim);
+    color: var(--gold-deep);
     font-family: var(--mono);
     font-size: 12px;
-    padding: 5px 10px;
-    border-radius: 4px;
+    padding: 7px 14px;
+    border-radius: 6px;
     cursor: pointer;
-    margin-left: 10px;
+    box-shadow: var(--shadow);
   }
-  .refresh-btn:hover { border-color: var(--gold); color: var(--gold-soft); }
+  .refresh-btn:hover { border-color: var(--gold); background: #fffaf0; }
 
-  /* --- Hero: walnut shell rings framing the keyword & sparkline --- */
+  /* --- Hero --- */
   .hero {
-    position: relative;
     display: flex;
-    flex-direction: column;
+    gap: 32px;
     align-items: center;
-    text-align: center;
-    padding: 24px 0 40px;
+    padding: 8px 0 44px;
+    flex-wrap: wrap;
   }
 
-  .shell-rings {
-    width: min(340px, 78vw);
-    height: min(340px, 78vw);
+  .logo-card {
+    width: 220px;
+    height: 160px;
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(226,169,58,0.28), transparent 65%),
+      var(--bg-hero);
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .logo-card img{
+    width: 118px;
+    height: 118px;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 10px rgba(43,32,24,0.15));
   }
 
-  .keyword-name {
-    font-family: var(--serif);
-    font-size: clamp(28px, 6vw, 40px);
-    color: var(--ivory);
-    letter-spacing: 0.02em;
-  }
+  .hero-text { flex: 1; min-width: 260px; }
 
-  .keyword-total {
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-family: var(--mono);
-    font-size: clamp(40px, 9vw, 64px);
-    color: var(--gold-soft);
-    line-height: 1;
-    margin: 6px 0 2px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--gold-deep);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width: 22px; height: 1px;
+    background: var(--gold);
   }
 
-  .keyword-sub {
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4.2vw, 40px);
+    line-height: 1.25;
+    color: var(--ink);
+    margin: 0 0 12px;
+  }
+
+  .hero-desc {
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height: 1.7;
+    max-width: 46ch;
+    margin: 0 0 18px;
+  }
+
+  .keyword-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 16px;
     font-family: var(--mono);
     font-size: 13px;
-    color: var(--ivory-dim);
-    letter-spacing: 0.04em;
+    color: var(--gold-deep);
+    background: #fffaf0;
+    box-shadow: var(--shadow);
   }
 
-  .split-row {
+  /* --- Section header --- */
+  .section-head {
     display: flex;
-    gap: 28px;
-    margin-top: 18px;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
   }
-  .split-item { text-align: center; }
-  .split-label {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    color: var(--ivory-dim);
-    text-transform: uppercase;
-  }
-  .split-value {
-    font-family: var(--mono);
+  .section-head h2 {
+    font-family: var(--serif);
+    font-weight: 400;
     font-size: 20px;
-    color: var(--ivory);
-    margin-top: 4px;
+    color: var(--ink);
+    margin: 0;
+  }
+  .section-head .meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-dim);
   }
 
-  /* --- History table --- */
+  /* --- Metric cards --- */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 44px;
+  }
+  @media (max-width: 700px){
+    .metric-grid { grid-template-columns: 1fr; }
+  }
+
+  .metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--card-accent, var(--gold));
+    border-radius: 10px;
+    padding: 20px 20px 18px;
+    box-shadow: var(--shadow);
+  }
+  .metric-card.total { --card-accent: var(--total-accent); }
+  .metric-card.pc { --card-accent: var(--pc-accent); }
+  .metric-card.mobile { --card-accent: var(--mobile-accent); }
+
+  .metric-label {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .metric-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .metric-value {
+    font-family: var(--mono);
+    font-size: clamp(24px, 3.4vw, 30px);
+    color: var(--ink);
+  }
+  .metric-card.total .metric-value { color: var(--total-accent); }
+  .metric-card.pc .metric-value { color: var(--pc-accent); }
+  .metric-card.mobile .metric-value { color: var(--mobile-accent); }
+
+  .metric-pct {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--ink-dim);
+  }
+
+  .metric-sub {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-dim);
+  }
+  .metric-sub .diff-up { color: var(--up); }
+  .metric-sub .diff-down { color: var(--down); }
+
+  /* --- Chart panel --- */
   .panel {
     background: var(--bg-panel);
     border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 22px 20px 8px;
+    border-radius: 12px;
+    padding: 24px 22px 20px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
   }
 
-  .panel h2 {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 16px;
-    color: var(--gold-soft);
-    margin: 0 0 16px;
-    letter-spacing: 0.04em;
+  .legend {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 14px;
   }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 
+  .chart-scroll { overflow-x: auto; }
+  .chart-scroll svg { display: block; }
+
+  /* --- Detail table --- */
   table { width: 100%; border-collapse: collapse; }
   thead th {
     text-align: right;
     font-size: 11px;
     letter-spacing: 0.08em;
-    color: var(--ivory-dim);
+    color: var(--ink-dim);
     font-weight: 400;
     padding: 8px 6px;
     border-bottom: 1px solid var(--line);
@@ -169,40 +295,36 @@
     font-size: 13px;
     padding: 9px 6px;
     border-bottom: 1px solid var(--line);
-    color: var(--ivory);
+    color: var(--ink);
   }
   tbody td:first-child {
     text-align: left;
     font-family: var(--sans);
-    color: var(--ivory-dim);
+    color: var(--ink-dim);
   }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: rgba(201,154,62,0.06); }
+  tbody tr:hover td { background: #fdf7ea; }
 
   .empty, .error {
     font-family: var(--mono);
     font-size: 13px;
-    color: var(--ivory-dim);
+    color: var(--ink-dim);
     text-align: center;
     padding: 40px 0;
   }
-  .error { color: #d98a6b; }
+  .error { color: var(--down); }
 
   footer {
     margin-top: 32px;
     text-align: center;
     font-family: var(--mono);
     font-size: 11px;
-    color: var(--ivory-dim);
-    opacity: 0.7;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .keyword-total { transition: opacity 0.4s ease; }
+    color: var(--ink-dim);
+    opacity: 0.8;
   }
 
   button:focus-visible, a:focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--gold-deep);
     outline-offset: 2px;
   }
 </style>
@@ -210,36 +332,78 @@
 <body>
   <div class="wrap">
     <header class="top">
-      <div class="brand">Keyword Tracker</div>
+      <div class="brand">복호두</div>
       <div class="status">
-        <span id="updatedAt">불러오는 중…</span>
+        <span class="status-text" id="updatedAt">불러오는 중…</span>
         <button class="refresh-btn" id="refreshBtn" type="button">↻ 새로고침</button>
       </div>
     </header>
 
     <section class="hero">
-      <svg class="shell-rings" id="shellRings" viewBox="0 0 340 340" aria-hidden="true"></svg>
-      <div class="keyword-name">복호두</div>
-      <div class="keyword-total" id="totalValue">–</div>
-      <div class="keyword-sub">월간 검색량 (PC + 모바일)</div>
-      <div class="split-row">
-        <div class="split-item">
-          <div class="split-label">PC</div>
-          <div class="split-value" id="pcValue">–</div>
-        </div>
-        <div class="split-item">
-          <div class="split-label">Mobile</div>
-          <div class="split-value" id="mobileValue">–</div>
-        </div>
+      <div class="logo-card"><img src="assets/bokhodu-character.jpg" alt="복호두 캐릭터" /></div>
+      <div class="hero-text">
+        <div class="eyebrow">Keyword Tracker</div>
+        <h1 class="hero-title">키워드 검색량<br />트래커</h1>
+        <p class="hero-desc">네이버 검색광고 API를 통해 매일 오전 9시 자동으로 키워드 검색량을 수집하고 추적합니다.</p>
+        <span class="keyword-pill">🔑 복호두</span>
       </div>
     </section>
 
-    <section class="panel">
-      <h2>최근 추이</h2>
+    <div class="section-head">
+      <h2>오늘의 검색량</h2>
+      <span class="meta" id="todayDate">–</span>
+    </div>
+
+    <div class="metric-grid" id="metricGrid">
+      <div class="metric-card total">
+        <div class="metric-label">합계</div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="totalValue">–</span>
+          <span class="metric-pct">100%</span>
+        </div>
+        <div class="metric-sub" id="totalSub">–</div>
+      </div>
+      <div class="metric-card pc">
+        <div class="metric-label">PC</div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="pcValue">–</span>
+          <span class="metric-pct" id="pcPct">–</span>
+        </div>
+        <div class="metric-sub" id="pcSub">–</div>
+      </div>
+      <div class="metric-card mobile">
+        <div class="metric-label">Mobile</div>
+        <div class="metric-value-row">
+          <span class="metric-value" id="mobileValue">–</span>
+          <span class="metric-pct" id="mobilePct">–</span>
+        </div>
+        <div class="metric-sub" id="mobileSub">–</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>검색량 추이</h2>
+      <span class="meta" id="chartRangeLabel">최근 60일</span>
+    </div>
+
+    <div class="panel">
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:var(--mobile-accent)"></span>Mobile</span>
+        <span class="legend-item"><span class="legend-dot" style="background:var(--pc-accent)"></span>PC</span>
+      </div>
+      <div class="chart-scroll" id="chartHost">
+        <div class="empty">데이터를 불러오는 중…</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>일별 상세</h2>
+    </div>
+    <div class="panel">
       <div id="tableHost">
         <div class="empty">데이터를 불러오는 중…</div>
       </div>
-    </section>
+    </div>
 
     <footer>네이버 검색광고 API · 매일 오전 9시 자동 수집</footer>
   </div>
@@ -249,11 +413,18 @@
   const KEYWORD = "복호두";
   const els = {
     updatedAt: document.getElementById("updatedAt"),
+    todayDate: document.getElementById("todayDate"),
     total: document.getElementById("totalValue"),
+    totalSub: document.getElementById("totalSub"),
     pc: document.getElementById("pcValue"),
+    pcPct: document.getElementById("pcPct"),
+    pcSub: document.getElementById("pcSub"),
     mobile: document.getElementById("mobileValue"),
+    mobilePct: document.getElementById("mobilePct"),
+    mobileSub: document.getElementById("mobileSub"),
+    chartHost: document.getElementById("chartHost"),
+    chartRangeLabel: document.getElementById("chartRangeLabel"),
     tableHost: document.getElementById("tableHost"),
-    rings: document.getElementById("shellRings"),
     refreshBtn: document.getElementById("refreshBtn"),
   };
 
@@ -262,45 +433,94 @@
     return n.toLocaleString("ko-KR");
   }
 
-  function fmtDate(d) {
+  function fmtMD(d) {
     const [, m, day] = d.split("-");
-    return `${m}.${day}`;
+    return `${m}-${day}`;
   }
 
-  // 동심원(호두 껍질 나이테) 안에 최근 검색량 추이를 그려주는 신 sparkline
-  function drawShellRings(history) {
-    const size = 340, cx = size / 2, cy = size / 2;
-    const rings = [150, 120, 92, 66];
-    let svg = "";
+  function renderMetrics(history) {
+    if (!history.length) {
+      els.todayDate.textContent = "–";
+      return;
+    }
+    const latest = history[history.length - 1];
+    const prev = history.length > 1 ? history[history.length - 2] : null;
+    const window30 = history.slice(-30);
+    const rangeLabel = window30.length
+      ? `${fmtMD(window30[0].date)} ~ ${fmtMD(window30[window30.length - 1].date)}`
+      : "";
 
-    rings.forEach((r, i) => {
-      const opacity = 0.16 + i * 0.05;
-      svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--shell)" stroke-width="1" opacity="${opacity}" />`;
-    });
+    els.todayDate.textContent = latest.date;
 
-    if (history.length > 1) {
-      const values = history.map((h) => h.total);
-      const max = Math.max(...values, 1);
-      const min = Math.min(...values, 0);
-      const range = Math.max(max - min, 1);
-      const R = 96;
-      const points = history.map((h, i) => {
-        const t = i / (history.length - 1);
-        const angle = -Math.PI / 2 + t * Math.PI * 1.5;
-        const norm = (h.total - min) / range;
-        const radius = R * 0.55 + norm * R * 0.45;
-        const x = cx + radius * Math.cos(angle);
-        const y = cy + radius * Math.sin(angle);
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-      });
-      svg += `<polyline points="${points.join(" ")}" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />`;
-      const lastPt = points[points.length - 1].split(",");
-      svg += `<circle cx="${lastPt[0]}" cy="${lastPt[1]}" r="4.5" fill="var(--gold-soft)" />`;
-    } else {
-      svg += `<circle cx="${cx}" cy="${cy}" r="3" fill="var(--gold)" opacity="0.6" />`;
+    els.total.textContent = fmt(latest.total);
+    els.pc.textContent = fmt(latest.pc);
+    els.mobile.textContent = fmt(latest.mobile);
+
+    const pcPct = latest.total ? (latest.pc / latest.total) * 100 : 0;
+    const mobilePct = latest.total ? (latest.mobile / latest.total) * 100 : 0;
+    els.pcPct.textContent = `${pcPct.toFixed(1)}%`;
+    els.mobilePct.textContent = `${mobilePct.toFixed(1)}%`;
+
+    let diffHtml = `${rangeLabel} · 최근 30일`;
+    if (prev) {
+      const diff = latest.total - prev.total;
+      const cls = diff >= 0 ? "diff-up" : "diff-down";
+      const arrow = diff >= 0 ? "▲" : "▼";
+      diffHtml = `${rangeLabel} · <span class="${cls}">${arrow} ${fmt(Math.abs(diff))}</span> 전일비`;
+    }
+    els.totalSub.innerHTML = diffHtml;
+    els.pcSub.textContent = `${rangeLabel} · 최근 30일`;
+    els.mobileSub.textContent = `${rangeLabel} · 최근 30일`;
+  }
+
+  function renderChart(history) {
+    const data = history.slice(-60);
+    els.chartRangeLabel.textContent = `최근 ${data.length}일`;
+
+    if (!data.length) {
+      els.chartHost.innerHTML = '<div class="empty">아직 수집된 데이터가 없습니다.</div>';
+      return;
     }
 
-    els.rings.innerHTML = svg;
+    const barW = 12, gap = 6;
+    const leftPad = 44, bottomPad = 26, topPad = 12;
+    const n = data.length;
+    const chartW = n * (barW + gap) + leftPad + 10;
+    const chartH = 260;
+    const plotH = chartH - topPad - bottomPad;
+
+    const maxTotal = Math.max(...data.map((d) => d.total), 1);
+    const niceMax = Math.ceil(maxTotal / 10000) * 10000 || 10;
+    const gridSteps = 4;
+
+    let svg = `<svg viewBox="0 0 ${chartW} ${chartH}" width="${chartW}" height="${chartH}" xmlns="http://www.w3.org/2000/svg">`;
+
+    for (let i = 0; i <= gridSteps; i++) {
+      const val = (niceMax / gridSteps) * i;
+      const y = topPad + plotH - (val / niceMax) * plotH;
+      svg += `<line x1="${leftPad}" y1="${y}" x2="${chartW - 4}" y2="${y}" stroke="rgba(43,32,24,0.08)" stroke-width="1" />`;
+      svg += `<text x="${leftPad - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#8d7d6a">${val >= 1000 ? Math.round(val / 1000) + "k" : val}</text>`;
+    }
+
+    const labelStep = Math.max(1, Math.ceil(n / 30));
+
+    data.forEach((d, i) => {
+      const x = leftPad + i * (barW + gap);
+      const mobileH = (d.mobile / niceMax) * plotH;
+      const pcH = (d.pc / niceMax) * plotH;
+      const yMobileTop = topPad + plotH - mobileH;
+      const yPcTop = yMobileTop - pcH;
+
+      svg += `<rect x="${x}" y="${yMobileTop}" width="${barW}" height="${mobileH}" fill="var(--mobile-accent)" rx="1.5" />`;
+      svg += `<rect x="${x}" y="${yPcTop}" width="${barW}" height="${pcH}" fill="var(--pc-accent)" rx="1.5" />`;
+
+      if (i % labelStep === 0) {
+        svg += `<text x="${x + barW / 2}" y="${chartH - 6}" text-anchor="middle" font-size="9.5" fill="#8d7d6a" transform="rotate(-40 ${x + barW / 2} ${chartH - 6})">${fmtMD(d.date)}</text>`;
+      }
+    });
+
+    svg += `</svg>`;
+    els.chartHost.innerHTML = svg;
   }
 
   function renderTable(history) {
@@ -310,7 +530,7 @@
     }
     const rows = [...history].reverse().slice(0, 30).map((h) => `
       <tr>
-        <td>${fmtDate(h.date)}</td>
+        <td>${fmtMD(h.date)}</td>
         <td>${fmt(h.pc)}</td>
         <td>${fmt(h.mobile)}</td>
         <td>${fmt(h.total)}</td>
@@ -336,14 +556,10 @@
 
       const entry = data.keywords?.[KEYWORD];
       const history = entry?.history ?? [];
-      const latest = history[history.length - 1];
 
-      drawShellRings(history);
+      renderMetrics(history);
+      renderChart(history);
       renderTable(history);
-
-      els.total.textContent = latest ? fmt(latest.total) : "–";
-      els.pc.textContent = latest ? fmt(latest.pc) : "–";
-      els.mobile.textContent = latest ? fmt(latest.mobile) : "–";
 
       els.updatedAt.textContent = data.updatedAt
         ? `업데이트: ${new Date(data.updatedAt).toLocaleString("ko-KR")}`
@@ -352,7 +568,7 @@
       console.error(err);
       els.updatedAt.textContent = "불러오기 실패";
       els.tableHost.innerHTML = `<div class="error">데이터를 불러올 수 없습니다: ${err.message}</div>`;
-      drawShellRings([]);
+      els.chartHost.innerHTML = `<div class="error">차트를 표시할 수 없습니다.</div>`;
     }
   }
 
