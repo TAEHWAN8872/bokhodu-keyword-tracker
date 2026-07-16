@@ -3,7 +3,8 @@ name: Update Naver Keyword Data
 on:
   schedule:
     # 매일 00:00 UTC = 한국 시간(KST) 오전 9시
-    - cron: "0 0 * * *"
+    - cron: "17 33 * * *"  # 1차 시도 (KST 08:37경)
+    - cron: "0 12 * * *"   # 2차 시도 (KST 21:00, 1차가 실패/스킵됐을 때 보완)
   workflow_dispatch: {} # 수동 실행 버튼도 사용 가능
 
 permissions:
