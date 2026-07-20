@@ -1,12 +1,9 @@
 name: Update Naver Keyword Data
-
 on:
-schedule:
-  # 매일 KST 오전 8시 30분 (UTC 전날 23:30)
-  - cron: "30 23 * * *"
-  # 매일 KST 오후 9시 (UTC 12:00)
-  - cron: "0 12 * * *"
-  workflow_dispatch: {} # 수동 실행 버튼도 사용 가능
+  schedule:
+    - cron: "30 23 * * *"   # 매일 KST 오전 8시 30분 (UTC 전날 23:30)
+    - cron: "0 12 * * *"    # 매일 KST 오후 9시 (UTC 12:00)
+  workflow_dispatch: {}     # 수동 실행 버튼도 사용 가능
 
 permissions:
   contents: write
