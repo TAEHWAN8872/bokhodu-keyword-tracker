@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-23T01:45:11.127Z",
+  "updatedAt": "2026-10-23T16:39:30.212Z",
   "keywords": {
     "복호두": {
       "history": [
@@ -539,9 +539,9 @@
         },
         {
           "date": "2026-10-23",
-          "pc": 5,
-          "mobile": 5,
-          "total": 10
+          "pc": 10100,
+          "mobile": 81500,
+          "total": 91600
         }
       ],
       "found": true
